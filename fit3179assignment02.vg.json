@@ -338,4 +338,5 @@
   ],
   "spacing": 40,
   "resolve": { "scale": { "color": "independent" } }
+
 }

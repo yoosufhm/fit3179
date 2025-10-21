@@ -1,0 +1,341 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "params": [
+    {
+      "name": "minWaste",
+      "value": 0,
+      "bind": {
+        "input": "range",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "name": "Minimum Waste (MT): "
+      }
+    }
+  ],
+  "vconcat": [
+    {
+      "width": 800,
+      "height": 450,
+      "title": {
+        "text": "Total Plastic Waste Produced by Country",
+        "fontSize": 18,
+        "anchor": "middle"
+      },
+      "projection": {"type": "equalEarth"},
+      "data": {
+        "url": "https://raw.githubusercontent.com/yoosufhm/fit3179/refs/heads/main/map.json",
+        "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+      },
+      "transform": [
+        {
+          "lookup": "properties.NAME_EN",  
+          "from": {
+            "data": {
+              "url": "https://raw.githubusercontent.com/yoosufhm/fit3179/refs/heads/main/Plastic%20Waste%20Around%20the%20World.csv",
+              "format": {"type": "csv"}
+            },
+            "key": "Country",
+            "fields": ["Total_Plastic_Waste_MT"]
+          }
+        },
+        {
+          "calculate": "toNumber(datum.Total_Plastic_Waste_MT)",
+          "as": "Total_Plastic_Waste_MT"
+        },
+        {
+          "filter": "datum.Total_Plastic_Waste_MT >= minWaste || datum.Total_Plastic_Waste_MT == null"
+        }
+      ],
+      "mark": {"type": "geoshape", "stroke": "white", "strokeWidth": 0.5},
+      "encoding": {
+        "color": {
+          "field": "Total_Plastic_Waste_MT",
+          "type": "quantitative",
+          "title": "Total Plastic Waste (MT)",
+          "scale": {"scheme": "bluegreen"}
+        },
+        "tooltip": [
+          {"field": "properties.NAME_EN", "type": "nominal", "title": "Country"},
+          {"field": "Total_Plastic_Waste_MT", "type": "quantitative", "title": "Total Plastic Waste (MT)", "format": ".2f"}
+        ]
+      }
+    },
+    {
+      "width": 800,
+      "height": 400,
+      "title": {
+        "text": "Total Plastic Waste Produced by Country (Top 20)",
+        "fontSize": 18,
+        "anchor": "middle"
+      },
+      "data": {
+        "url": "https://raw.githubusercontent.com/yoosufhm/fit3179/refs/heads/main/Plastic%20Waste%20Around%20the%20World.csv",
+        "format": {"type": "csv"}
+      },
+      "transform": [
+        {
+          "calculate": "toNumber(datum.Total_Plastic_Waste_MT)",
+          "as": "Total_Plastic_Waste_MT"
+        },
+        {
+          "filter": "datum.Total_Plastic_Waste_MT >= minWaste"
+        },
+        {
+          "window": [{"op": "rank", "as": "rank"}],
+          "sort": [{"field": "Total_Plastic_Waste_MT", "order": "descending"}]
+        },
+        {
+          "filter": "datum.rank <= 20"
+        }
+      ],
+      "layer": [
+        {
+          "mark": "bar",
+          "encoding": {
+            "x": {
+              "field": "Country",
+              "type": "nominal",
+              "title": "Country",
+              "sort": "-y",
+              "axis": {"labelAngle": -45, "labelFontSize": 10}
+            },
+            "y": {
+              "field": "Total_Plastic_Waste_MT",
+              "type": "quantitative",
+              "title": "Total Plastic Waste (MT)"
+            },
+            "color": {
+              "field": "Total_Plastic_Waste_MT",
+              "type": "quantitative",
+              "scale": {"scheme": "blues"},
+              "legend": null
+            },
+            "tooltip": [
+              {"field": "Country", "type": "nominal", "title": "Country"},
+              {"field": "Total_Plastic_Waste_MT", "type": "quantitative", "title": "Total Plastic Waste (MT)", "format": ".2f"},
+              {"field": "rank", "type": "quantitative", "title": "Rank"}
+            ]
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "align": "center",
+            "baseline": "bottom",
+            "dy": -5,
+            "fontSize": 9,
+            "fontWeight": "bold"
+          },
+          "encoding": {
+            "x": {
+              "field": "Country",
+              "type": "nominal",
+              "sort": "-y"
+            },
+            "y": {
+              "field": "Total_Plastic_Waste_MT",
+              "type": "quantitative"
+            },
+            "text": {
+              "field": "Total_Plastic_Waste_MT",
+              "type": "quantitative",
+              "format": ".1f"
+            },
+            "color": {"value": "black"},
+            "opacity": {
+              "condition": {
+                "test": "datum.rank <= 5",
+                "value": 1
+              },
+              "value": 0
+            }
+          }
+        }
+      ]
+    },
+  
+    {
+    "width": 700,
+    "height": 350,
+    "title": {
+      "text": "Plastic Waste vs CO2 Emissions by Country",
+      "fontSize": 18,
+      "anchor": "middle"
+    },
+    "data": {
+      "url": "https://raw.githubusercontent.com/yoosufhm/fit3179/refs/heads/Assignment-02/environmental_impact_data.csv",
+      "format": { "type": "csv" }
+    },
+    "transform": [
+      {
+        "calculate": "toNumber(datum.Plastic_Waste_Tons)",
+        "as": "Plastic_Waste_Tons"
+      },
+      {
+        "calculate": "toNumber(datum.CO2_Emissions_Tons)",
+        "as": "CO2_Emissions_Tons"
+      },
+      {
+        "filter": "datum.Plastic_Waste_Tons != null && datum.CO2_Emissions_Tons != null && datum.Plastic_Waste_Tons >= minWaste"
+      },
+      {
+        "window": [{"op": "rank", "as": "rank"}],
+        "sort": [{"field": "Plastic_Waste_Tons", "order": "descending"}]
+      },
+      {
+        "filter": "datum.rank <= 20"
+      }
+    ],
+    "mark": "point",
+    "encoding": {
+      "x": {
+        "field": "Plastic_Waste_Tons",
+        "type": "quantitative",
+        "title": "Plastic Waste (Tons)",
+        "scale": {"type": "log",
+        "domain": [4000, 15000]},
+        "axis": {
+          "labelFontSize": 10,
+          "titleFontSize": 12
+        }
+      },
+      "y": {
+        "field": "CO2_Emissions_Tons",
+        "type": "quantitative",
+        "title": "CO2 Emissions (Tons)",
+        "scale": {"type": "log",
+        "domain": [2000, 10000]},
+        "axis": {
+          "labelFontSize": 10,
+          "titleFontSize": 12
+        }
+      },
+      "size": {
+        "field": "Population_Affected",
+        "type": "quantitative",
+        "title": "Population Affected",
+        "scale": { "type": "sqrt" }
+      },
+      "color": {
+        "field": "Country",
+        "type": "nominal",
+        "title": "Country",
+        "scale": {
+          "scheme": "category20"
+        }
+      },
+      "tooltip": [
+        { "field": "Country", "type": "nominal", "title": "Country" },
+        { "field": "Plastic_Waste_Tons", "type": "quantitative", "title": "Plastic Waste (Tons)", "format": ".2f" },
+        { "field": "CO2_Emissions_Tons", "type": "quantitative", "title": "CO2 Emissions (Tons)", "format": ".2f" }
+      ]
+    }
+  },
+
+  {
+  "width": 500,
+  "height": 500,
+  "title": {
+    "text": "Plastic Waste by Source",
+    "fontSize": 18,
+    "anchor": "middle"
+  },
+  "data": {
+    "url": "https://raw.githubusercontent.com/yoosufhm/fit3179/refs/heads/main/Plastic%20Waste%20Around%20the%20World.csv",
+    "format": { "type": "csv" }
+  },
+  "transform": [
+    {
+      "calculate": "toNumber(datum.Total_Plastic_Waste_MT)",
+      "as": "Total_Plastic_Waste_MT"
+    }
+  ],
+  "mark": "arc",
+  "encoding": {
+    "theta": {
+      "field": "Total_Plastic_Waste_MT",
+      "type": "quantitative",
+      "title": "Total Plastic Waste (MT)"
+    },
+    "color": {
+      "field": "Main_Sources",
+      "type": "nominal",
+      "title": "Source",
+      "scale": {
+        "scheme": "category20"
+      }
+    },
+    "tooltip": [
+      { "field": "Main_Sources", "type": "nominal", "title": "Source" },
+      { "field": "Total_Plastic_Waste_MT", "type": "quantitative", "title": "Plastic Waste (MT)", "format": ".2f" },
+      { "field": "Country", "type": "nominal", "title": "Country" }
+    ]
+  }
+},
+
+  {
+  "width": 800,
+  "height": 400,
+  "title": {
+    "text": "Plastic Waste vs Recycling Rate by Country",
+    "fontSize": 18,
+    "anchor": "middle"
+  },
+  "data": {
+    "url": "https://raw.githubusercontent.com/yoosufhm/fit3179/refs/heads/main/Plastic%20Waste%20Around%20the%20World.csv",
+    "format": { "type": "csv" }
+  },
+  "transform": [
+    {
+      "calculate": "toNumber(datum.Total_Plastic_Waste_MT)",
+      "as": "Total_Plastic_Waste_MT"
+    },
+    {
+      "calculate": "toNumber(datum.Recycling_Rate)",
+      "as": "Recycling_Rate"
+    },
+    {
+      "window": [
+        {"op": "rank", "as": "rank"}
+      ],
+      "sort": [
+        {"field": "Total_Plastic_Waste_MT", "order": "descending"}
+      ]
+    },
+    {
+      "filter": "datum.rank <= 20"  
+    }
+  ],
+  "mark": "bar",
+  "encoding": {
+    "x": {
+      "field": "Country",
+      "type": "nominal",
+      "title": "Country",
+      "axis": { "labelAngle": -45, "labelFontSize": 10 }
+    },
+    "y": {
+      "field": "Total_Plastic_Waste_MT",
+      "type": "quantitative",
+      "title": "Plastic Waste (MT)"
+    },
+    "color": {
+      "field": "Recycling_Rate",
+      "type": "quantitative",
+      "title": "Recycling Rate",
+      "scale": { "scheme": "greens" }
+    },
+    "tooltip": [
+      { "field": "Country", "type": "nominal", "title": "Country" },
+      { "field": "Total_Plastic_Waste_MT", "type": "quantitative", "title": "Plastic Waste (MT)" },
+      { "field": "Recycling_Rate", "type": "quantitative", "title": "Recycling Rate (%)" }
+    ]
+  }
+}
+
+
+  ],
+  "spacing": 40,
+  "resolve": { "scale": { "color": "independent" } }
+}

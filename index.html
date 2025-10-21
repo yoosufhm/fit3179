@@ -1,26 +1,456 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
-<script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.0"></script>
-<script src="https://cdn.jsdelivr.net/npm/vega-embed@6.17.0"></script>
-<script src="vega_lite_vis.js"></script>
-<title>First Vega-Lite graph </title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Plastic Waste Crisis</title>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5.25.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.16.3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.24.0"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Slab:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #213f6e;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    header {
+      background: #2c5aa0;
+      color: white;
+      padding: 40px 30px;
+      text-align: center;
+      border-bottom: 4px solid #e74c3c;
+    }
+
+    header h1 {
+      font-family: 'Roboto Slab', serif;
+      font-size: 2.5em;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    header .subtitle {
+      font-size: 1.1em;
+      margin-bottom: 20px;
+    }
+
+    .author-box {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 12px 25px;
+      border-radius: 4px;
+      margin-top: 15px;
+      font-size: 0.9em;
+    }
+
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgb(36, 143, 182);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .section {
+      padding: 40px 50px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .section:last-of-type {
+      border-bottom: none;
+    }
+
+    .section:nth-child(even) {
+      background: #fafafa;
+    }
+
+    .section-header {
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #e74c3c;
+    }
+
+    .section-number {
+      font-family: 'Roboto Slab', serif;
+      font-size: 2.2em;
+      font-weight: 600;
+      color: #e74c3c;
+      margin-right: 15px;
+    }
+
+    .section-title {
+      font-family: 'Roboto Slab', serif;
+      font-size: 1.8em;
+      font-weight: 500;
+      color: #2c5aa0;
+      display: inline;
+    }
+
+    .intro-box {
+      background: #e8f4f8;
+      border-left: 4px solid #2c5aa0;
+      padding: 25px 30px;
+      margin-bottom: 20px;
+    }
+
+    .content-text {
+      font-size: 1.0em;
+      color: #444;
+      margin-bottom: 18px;
+      text-align: justify;
+      line-height: 1.7;
+    }
+
+    .viz-container {
+      margin: 30px 0;
+      padding: 20px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+    }
+
+    .section:nth-child(even) .viz-container {
+      background: white;
+    }
+
+    .content-highlight {
+      margin: 20px 0;
+    }
+
+    .content-highlight p {
+      margin-bottom: 15px;
+    }
+
+    .conclusion-section {
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+    }
+
+    .conclusion-section .section-title {
+      color: #2e7d32;
+    }
+
+    footer {
+      background: #34495e;
+      color: white;
+      padding: 35px 50px;
+    }
+
+    footer h3 {
+      font-family: 'Roboto Slab', serif;
+      font-size: 1.3em;
+      margin-bottom: 20px;
+      color: white;
+      border-bottom: 2px solid #e74c3c;
+      padding-bottom: 8px;
+      display: inline-block;
+    }
+
+    .data-sources {
+      margin-bottom: 30px;
+    }
+
+    .source-item {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px 15px;
+      margin: 8px 0;
+      border-left: 3px solid #3498db;
+    }
+
+    .source-item strong {
+      color: #3498db;
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.95em;
+    }
+
+    .source-item a {
+      color: #ecf0f1;
+      text-decoration: none;
+      word-break: break-all;
+      font-size: 0.85em;
+    }
+
+    .source-item a:hover {
+      color: #3498db;
+      text-decoration: underline;
+    }
+
+    .footer-meta {
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      margin-top: 20px;
+      font-size: 0.9em;
+    }
+
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin: 25px 0;
+    }
+
+    @media (max-width: 1024px) {
+      .section {
+        padding: 40px 40px;
+      }
+
+      header h1 {
+        font-size: 2.5em;
+      }
+
+      .section-number {
+        font-size: 2.5em;
+      }
+
+      .section-title {
+        font-size: 1.7em;
+      }
+
+      .two-column {
+        grid-template-columns: 1fr;
+        gap: 25px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 35px 25px;
+      }
+
+      header h1 {
+        font-size: 2em;
+      }
+
+      header .subtitle {
+        font-size: 1em;
+      }
+
+      .section {
+        padding: 30px 25px;
+      }
+
+      .section-number {
+        font-size: 2em;
+        min-width: 45px;
+      }
+
+      .section-title {
+        font-size: 1.4em;
+      }
+
+      .viz-container {
+        padding: 15px;
+      }
+
+      footer {
+        padding: 30px 25px;
+      }
+    }
+  </style>
 </head>
 <body>
-<h1>First Vega-Lite graph</h1>
-<div id="bar_chart">
-</div>
-<script type = "text/javascript">
-    var vg_1 = "daily_cost.vg.json";
-vegaEmbed("#bar_chart", vg_1).then(function(result) {
-// Access the Vega view instance
-//(https://vega.github.io/vega/docs/api/view/) as result.view
-}).catch(console.error);
-</script>
+
+  <header>
+    <h1>Global Plastic Waste Crisis</h1>
+  </header>
+
+  <div class="main-container">
+
+    <div class="section">
+      <div class="intro-box">
+        <p class="content-text" style="margin-bottom: 0;">
+          One of the most critical environmental problems of our day is plastic garbage, which has an 
+          impact on ecosystems, wildlife, and human health everywhere. The following visualizations covers 
+          the sources, effects on the environment, and recycling initiatives of plastic trash generation in various nations. 
+          It is essential to understand these patterns in order to create environmental regulations and waste management plans that work.
+        </p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-number">01</div>
+        <h2 class="section-title">Global Distribution of Plastic Waste</h2>
+      </div>
+      
+      <p class="content-text">
+        The globally distributed topography of plastic garbage generated is represented in the choropleth map below,
+        where larger waste volumes are indicated by darker red hues. To concentrate on significant contributors or reduce 
+        waste output.
+      </p>
+
+      <div class="viz-container">
+        <div id="viz1"></div>
+      </div>
+
+      <p class="content-text">
+        The map clearly demonstrates that the majority of plastic garbage is produced in developed and populated countries.
+        The biggest producers are China, the US, and India, which is indicative of their large populations and high levels of 
+        of consumer purchases and industry activity. It's interesting to realize that, when analyzed per capita, waste production is 
+        high in many smaller countries with developed economies, indicating that consumption patterns are just as important as population size.
+      </p>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-number">02</div>
+        <h2 class="section-title">Which Countries Produce the Most Plastic Waste?</h2>
+      </div>
+
+      <p class="content-text">
+        This bar chart ranks the top 20 countries by total plastic waste production, providing a 
+        clearer comparison of the magnitude of waste generated by each nation. The color intensity 
+        corresponds to waste volume.
+      </p>
+
+      <div class="viz-container">
+        <div id="viz2"></div>
+      </div>
+
+      <p class="content-text">
+        After the top five nations, which collectively contribute an excess of the world's plastic garbage, there follows a sharp decline. 
+        India and the United States are in second and third place behind China. This quantity indicates that the intended 
+        Measures in these important producing nations may have a significant worldwide effect. Although the real causes may vary—production-driven
+        in developing economies and consumption-driven in developed ones—the inclusion of both developed and developing countries in this ranking 
+        suggests that plastic waste is a problem that cuts across economic development levels.
+      </p>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-number">03</div>
+        <h2 class="section-title">Does CO2 Emission and Plastic Waste Cause Environmental Problems?</h2>
+      </div>
+
+      <p class="content-text">
+        This scatter plot illustrates the connection between plastic trash and CO2 emissions. Colors identify nations, while point sizes indicate the people impacted.
+      </p>
+
+      <div class="viz-container">
+        <div id="viz3"></div>
+      </div>
+
+      <p class="content-text">
+        CO2 emissions are higher in nations that produce more plastic garbage. Fossil fuels are necessary as a raw ingredient for the manufacturing of plastic 
+        and energy source, whereas burning for disposal results in the release of more CO2. Because of these two effects, cutting back on plastic waste is crucial 
+        for mitigating climate change and controlling pollution.
+      </p>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-number">04</div>
+        <h2 class="section-title">Sources of Plastic Waste</h2>
+      </div>
+
+      <p class="content-text">
+        Creating specific reductions measures requires an understanding of the sources of plastic trash. 
+        The main sources of plastic garbage in different countries and sectors are broken down in this visualisation.
+      </p>
+
+      <div class="viz-container">
+        <div id="viz4"></div>
+      </div>
+
+      <p class="content-text">
+        The majority of plastic trash produced worldwide comes from packaging materials, primarily 
+        from single-use products like bags, bottles, and food containers. Although they are utilized 
+        for a short time, some items last for centuries. Consumer products and textiles are further sources. 
+        Overall plastic waste might be significantly decreased by concentrating on single-use plastics through 
+        improved packaging design and recycling regulations.
+      </p>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-number">05</div>
+        <h2 class="section-title">Recycling Rates vs Plastic Waste Produced</h2>
+      </div>
+
+      <p class="content-text">
+        Although the manufacturing of plastic garbage is a global issue, recycling efforts differ significantly between nations.
+        Countries have very different recycling rates; South Korea and Japan have high recycling rates because of their effective
+        waste management systems. The poor recycling rates of many major garbage producers show the need for improved infrastructure, 
+        recycled material markets, and public education to help close the gap.
+      </p>
+
+      <div class="viz-container">
+        <div id="viz5"></div>
+      </div>
+    </div>
+
+    <div class="section conclusion-section">
+      <div class="section-header">
+        <div class="section-number">06</div>
+        <h2 class="section-title">What Could Be Done for a Better Future?</h2>
+      </div>
+
+      <p class="content-text">
+        Plastic trash is a worldwide problem that is concentrated in a small number of nations, and focused efforts have the potential 
+        to make a big difference. Variable recycling rates demonstrate that change is achievable with the right infrastructure, but 
+        the connection between plastic waste and CO2 emissions emphasizes the need for coordinated approaches. Reducing plastic 
+        consumption, increasing recyclability, and making investments in substitutes should be the main goals of effective solutions.
+      </p>
+
+      <p class="content-text">
+        Addressing the situation requires individual accountability, business responsibility, and governmental measures like taxes and prohibitions.
+        Only through combined efforts can we effectively tackle the plastic waste crisis and protect our planet for future generations.
+      </p>
+    </div>
+
+  </div>
+
+  <footer>
+    <h3>Data Sources & Attribution</h3>
+    <div class="data-sources">
+      <div class="source-item">
+        <strong>Dataset 1: Global Plastic Waste 2023</strong>
+        <a href="https://www.kaggle.com/datasets/prajwaldongre/global-plastic-waste-2023-a-country-wise-analysis" target="_blank">
+          https://www.kaggle.com/datasets/prajwaldongre/global-plastic-waste-2023-a-country-wise-analysis
+        </a>
+      </div>
+      <div class="source-item">
+        <strong>Dataset 2: Global Environmental Impact</strong>
+        <a href="https://www.kaggle.com/datasets/khushikyad001/global-environmental-impact" target="_blank">
+          https://www.kaggle.com/datasets/khushikyad001/global-environmental-impact
+        </a>
+      </div>
+      <div class="source-item">
+        <strong>Map Data</strong>
+        Natural Earth
+      </div>
+    </div>
+    <div class="footer-meta">
+      Mohamed Yoosuf Salih Mohamed Fiham | FIT3179 Data Visualisation 2
+    </div>
+  </footer>
+
+  <script type="text/javascript">
+    fetch('homework.vg.json')
+      .then(response => response.json())
+      .then(spec => {
+        const rootParams = spec.params || [];
+        
+        ['viz1', 'viz2', 'viz3', 'viz4', 'viz5'].forEach((vizId, index) => {
+          const standaloneSpec = {
+            "$schema": spec.$schema,
+            "params": rootParams,
+            ...spec.vconcat[index]
+          };
+          
+          vegaEmbed(`#${vizId}`, standaloneSpec, {actions: false});
+        });
+      })
+      .catch(error => console.error('Error loading visualizations:', error));
+  </script>
+
 </body>
 </html>
-

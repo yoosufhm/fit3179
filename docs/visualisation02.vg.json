@@ -164,7 +164,7 @@
       "anchor": "middle"
     },
     "data": {
-      "url": "environmental_impact_data.csv",
+      "url": "https://raw.githubusercontent.com/yoosufhm/fit3179/refs/heads/Assignment-02/environmental_impact_data.csv",
       "format": { "type": "csv" }
     },
     "transform": [
